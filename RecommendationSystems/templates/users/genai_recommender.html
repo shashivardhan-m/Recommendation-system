@@ -1,0 +1,350 @@
+{% extends 'users/Userbase.html' %}
+
+{% block user_content %}
+<style>
+    .recommender-header {
+        margin-bottom: 2rem;
+    }
+
+    .recommender-header h2 {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: #f1f5f9;
+        margin-bottom: 0.35rem;
+    }
+
+    .recommender-header p {
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+
+    .recommender-layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        align-items: start;
+    }
+
+    .recommender-form-panel {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        border-radius: 18px;
+        padding: 2rem;
+        transition: all 0.3s ease;
+    }
+
+    .recommender-form-panel:hover {
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(139, 92, 246, 0.2);
+    }
+
+    .recommender-output-panel {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 18px;
+        padding: 2rem;
+        min-height: 300px;
+        transition: all 0.3s ease;
+    }
+
+    .recommender-output-panel:hover {
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .panel-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-weight: 700;
+        color: #475569;
+        margin-bottom: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .panel-label::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.07);
+    }
+
+    .form-field {
+        margin-bottom: 1.25rem;
+    }
+
+    .form-field label {
+        display: block;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-field select,
+    .form-field textarea {
+        width: 100%;
+        padding: 0.8rem 1rem;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        font-size: 0.9rem;
+        font-family: 'Inter', sans-serif;
+        color: #f1f5f9;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
+
+    .form-field select:focus,
+    .form-field textarea:focus {
+        border-color: #8b5cf6;
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+        background: rgba(255, 255, 255, 0.09);
+        outline: none;
+    }
+
+    .form-field select option {
+        background: #0f172a;
+    }
+
+    .form-field textarea {
+        min-height: 140px;
+        resize: vertical;
+        line-height: 1.6;
+    }
+
+    .task-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.35rem 0.8rem;
+        background: rgba(139, 92, 246, 0.1);
+        border: 1px solid rgba(139, 92, 246, 0.2);
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: #a78bfa;
+    }
+
+    .btn-generate {
+        width: 100%;
+        padding: 0.9rem;
+        background: linear-gradient(135deg, #3b82f6, #6d28d9);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: 'Inter', sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-generate::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .btn-generate:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 28px rgba(109, 40, 217, 0.5);
+    }
+
+    .btn-generate:hover::before {
+        opacity: 1;
+    }
+
+    /* Output Area */
+    .output-empty {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 260px;
+        gap: 0.75rem;
+        color: #334155;
+    }
+
+    .output-empty-icon {
+        font-size: 2.5rem;
+        opacity: 0.5;
+    }
+
+    .output-empty p {
+        font-size: 0.85rem;
+        text-align: center;
+        line-height: 1.5;
+    }
+
+    .output-box {
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-left: 3px solid #8b5cf6;
+        border-radius: 10px;
+        padding: 1.5rem;
+        font-size: 0.875rem;
+        line-height: 1.8;
+        color: #cbd5e1;
+        white-space: pre-wrap;
+        max-height: 480px;
+        overflow-y: auto;
+        font-family: 'Inter', sans-serif;
+        margin-top: 0.5rem;
+    }
+
+    .output-box::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .output-box::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .output-box::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 3px;
+    }
+
+    .output-success-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: rgba(16, 185, 129, 0.1);
+        border: 1px solid rgba(16, 185, 129, 0.25);
+        padding: 0.3rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #6ee7b7;
+        margin-bottom: 0.75rem;
+    }
+
+    .btn-pdf {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(139, 92, 246, 0.12);
+        border: 1px solid rgba(139, 92, 246, 0.25);
+        color: #a78bfa;
+        font-weight: 600;
+        font-size: 0.875rem;
+        padding: 0.65rem 1.25rem;
+        border-radius: 10px;
+        cursor: pointer;
+        font-family: 'Inter', sans-serif;
+        transition: all 0.3s ease;
+        margin-top: 1rem;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .btn-pdf:hover {
+        background: rgba(139, 92, 246, 0.2);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 16px rgba(139, 92, 246, 0.25);
+        box-shadow: none;
+    }
+
+    @media (max-width: 900px) {
+        .recommender-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="recommender-header">
+    <h2>🔮 AI-Powered Recommendation Engine</h2>
+    <p>Select a task, describe your system, and let Gemini AI generate expert insights.</p>
+</div>
+
+<div class="task-chips">
+    <span class="chip">🧠 GANs</span>
+    <span class="chip">🔬 VAEs</span>
+    <span class="chip">⚡ Transformers</span>
+    <span class="chip">❄️ Cold-Start</span>
+    <span class="chip">🎯 Diversity</span>
+    <span class="chip">💎 Gemini AI</span>
+</div>
+
+<div class="recommender-layout">
+    <!-- FORM PANEL -->
+    <div class="recommender-form-panel">
+        <div class="panel-label">⚙️ Configuration</div>
+
+        <form method="POST" id="recommender-form">
+            {% csrf_token %}
+            <div class="form-field">
+                <label for="task_type">Generative AI Task</label>
+                <select name="task_type" id="task_type" required>
+                    <option value="generate">🔮 Generate Synthetic Recommendations (GANs/VAEs)</option>
+                    <option value="cold_start">❄️ Address Cold Start Problem</option>
+                    <option value="diversity">🎯 Enhance Diversity in Results</option>
+                    <option value="evaluate">📊 Assess & Improve RS Architecture</option>
+                </select>
+            </div>
+
+            <div class="form-field">
+                <label for="input_text">Problem Description / RS Context</label>
+                <textarea name="input_text" id="input_text" required
+                    placeholder="e.g., My model relies on collaborative filtering and suffers from cold-start issues for new books. Users receive repetitive recommendations..."></textarea>
+            </div>
+
+            <button type="submit" class="btn-generate" id="submit-btn">
+                <span id="btn-text">✨ Generate Insight with Gemini</span>
+            </button>
+        </form>
+    </div>
+
+    <!-- OUTPUT PANEL -->
+    <div class="recommender-output-panel">
+        <div class="panel-label">💡 Gemini Response</div>
+
+        {% if output %}
+        <div class="output-success-tag">✅ Response Generated</div>
+        <div class="output-box">{{ output }}</div>
+
+        <form method="POST" action="{% url 'export_pdf' %}">
+            {% csrf_token %}
+            <input type="hidden" name="pdf_content" value="{{ output|escape }}">
+            <button type="submit" class="btn-pdf">📄 Download as PDF</button>
+        </form>
+
+        {% else %}
+        <div class="output-empty">
+            <div class="output-empty-icon">🤖</div>
+            <p>Your AI-generated recommendation insights will appear here after you submit the form.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    document.getElementById('recommender-form').addEventListener('submit', function () {
+        const btn = document.getElementById('submit-btn');
+        const btnText = document.getElementById('btn-text');
+        btn.disabled = true;
+        btnText.textContent = '⏳ Generating…';
+        btn.style.opacity = '0.7';
+    });
+</script>
+{% endblock %}

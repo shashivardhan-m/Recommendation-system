@@ -1,0 +1,267 @@
+{% extends 'admins/Adminbase.html' %}
+
+{% block content %}
+<style>
+    .users-header {
+        margin-bottom: 2rem;
+    }
+
+    .users-header h2 {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: #f1f5f9;
+        margin-bottom: 0.35rem;
+    }
+
+    .users-header p {
+        color: #64748b;
+        font-size: 0.875rem;
+    }
+
+    .table-wrapper {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 18px;
+        overflow: hidden;
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 700px;
+    }
+
+    thead {
+        background: rgba(124, 58, 237, 0.12);
+    }
+
+    th {
+        padding: 1rem 1.25rem;
+        text-align: left;
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        white-space: nowrap;
+    }
+
+    td {
+        padding: 1rem 1.25rem;
+        font-size: 0.875rem;
+        color: #cbd5e1;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    tbody tr {
+        transition: background 0.2s ease;
+    }
+
+    tbody tr:hover td {
+        background: rgba(255, 255, 255, 0.04);
+    }
+
+    tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    td.sno {
+        color: #475569;
+        font-size: 0.8rem;
+    }
+
+    td.name {
+        font-weight: 600;
+        color: #e2e8f0;
+    }
+
+    /* Status Badges */
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.28rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .badge-waiting {
+        background: rgba(245, 158, 11, 0.12);
+        border: 1px solid rgba(245, 158, 11, 0.25);
+        color: #fcd34d;
+    }
+
+    .badge-activated {
+        background: rgba(16, 185, 129, 0.12);
+        border: 1px solid rgba(16, 185, 129, 0.25);
+        color: #6ee7b7;
+    }
+
+    .badge-deactivated {
+        background: rgba(100, 116, 139, 0.12);
+        border: 1px solid rgba(100, 116, 139, 0.2);
+        color: #94a3b8;
+    }
+
+    /* Action Buttons */
+    .btn-action {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.35rem 0.8rem;
+        border-radius: 7px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+        cursor: pointer;
+        font-family: 'Inter', sans-serif;
+        white-space: nowrap;
+        margin: 0.1rem;
+    }
+
+    .btn-activate {
+        background: rgba(16, 185, 129, 0.1);
+        border-color: rgba(16, 185, 129, 0.25);
+        color: #6ee7b7;
+    }
+
+    .btn-activate:hover {
+        background: rgba(16, 185, 129, 0.2);
+        transform: translateY(-1px);
+        box-shadow: none;
+    }
+
+    .btn-deactivate {
+        background: rgba(245, 158, 11, 0.1);
+        border-color: rgba(245, 158, 11, 0.25);
+        color: #fcd34d;
+    }
+
+    .btn-deactivate:hover {
+        background: rgba(245, 158, 11, 0.2);
+        transform: translateY(-1px);
+        box-shadow: none;
+    }
+
+    .btn-delete {
+        background: rgba(239, 68, 68, 0.1);
+        border-color: rgba(239, 68, 68, 0.25);
+        color: #fca5a5;
+    }
+
+    .btn-delete:hover {
+        background: rgba(239, 68, 68, 0.2);
+        transform: translateY(-1px);
+        box-shadow: none;
+    }
+
+    .actions-cell {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+        align-items: center;
+    }
+
+    .empty-row td {
+        text-align: center;
+        padding: 3rem;
+        color: #475569;
+    }
+
+    /* Search/Filter row */
+    .table-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.25rem;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .user-count {
+        font-size: 0.8rem;
+        color: #475569;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 0.3rem 0.75rem;
+        border-radius: 999px;
+    }
+</style>
+
+<div class="users-header">
+    <h2>👥 Registered Users</h2>
+    <p>Manage user accounts — activate, deactivate, or remove access.</p>
+</div>
+
+<div class="table-toolbar">
+    <span class="user-count">
+        {% if data %}{{ data|length }} user{% if data|length != 1 %}s{% endif %}{% else %}No users{% endif %}
+    </span>
+</div>
+
+<div class="table-wrapper">
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Login ID</th>
+                <th>Mobile</th>
+                <th>Email</th>
+                <th>Locality</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in data %}
+            <tr>
+                <td class="sno">{{ forloop.counter }}</td>
+                <td class="name">{{ user.name }}</td>
+                <td>{{ user.loginid }}</td>
+                <td>{{ user.mobile }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.locality }}</td>
+                <td>
+                    {% if user.status == 'waiting' %}
+                    <span class="badge badge-waiting">⏳ Waiting</span>
+                    {% elif user.status == 'activated' %}
+                    <span class="badge badge-activated">✅ Active</span>
+                    {% elif user.status == 'deactivated' %}
+                    <span class="badge badge-deactivated">○ Inactive</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="actions-cell">
+                        {% if user.status == 'waiting' or user.status == 'deactivated' %}
+                        <a class="btn-action btn-activate" href="{% url 'ActivaUsers' %}?uid={{ user.id }}">✓
+                            Activate</a>
+                        {% endif %}
+                        {% if user.status == 'activated' %}
+                        <a class="btn-action btn-deactivate" href="{% url 'deactivate_user' %}?uid={{ user.id }}">⏸
+                            Deactivate</a>
+                        {% endif %}
+                        <a class="btn-action btn-delete" href="{% url 'delete_user' %}?uid={{ user.id }}"
+                            onclick="return confirm('Are you sure you want to permanently delete this user?');">✕
+                            Delete</a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr class="empty-row">
+                <td colspan="8">
+                    <div style="font-size:1.5rem; margin-bottom:0.5rem;">📭</div>
+                    No registered users found.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

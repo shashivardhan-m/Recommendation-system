@@ -1,0 +1,295 @@
+{% extends 'users/Userbase.html' %}
+
+{% block user_content %}
+<style>
+    .dashboard-greeting {
+        background: linear-gradient(135deg, rgba(30, 58, 138, 0.5), rgba(109, 40, 217, 0.4));
+        border: 1px solid rgba(139, 92, 246, 0.2);
+        border-radius: 20px;
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .dashboard-greeting::before {
+        content: '';
+        position: absolute;
+        top: -60px;
+        right: -60px;
+        width: 200px;
+        height: 200px;
+        background: radial-gradient(circle, rgba(139, 92, 246, 0.2), transparent 70%);
+        border-radius: 50%;
+    }
+
+    .greeting-left {
+        position: relative;
+        z-index: 1;
+    }
+
+    .greeting-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: rgba(16, 185, 129, 0.15);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        padding: 0.3rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #6ee7b7;
+        margin-bottom: 0.75rem;
+    }
+
+    .dashboard-greeting h2 {
+        font-size: clamp(1.6rem, 3vw, 2.2rem);
+        font-weight: 800;
+        color: #f1f5f9;
+        margin-bottom: 0.5rem;
+    }
+
+    .dashboard-greeting h2 .name {
+        background: linear-gradient(90deg, #a5f3fc, #c4b5fd);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .dashboard-greeting p {
+        color: #94a3b8;
+        font-size: 0.95rem;
+        max-width: 480px;
+        line-height: 1.6;
+    }
+
+    .greeting-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: linear-gradient(135deg, #3b82f6, #6d28d9);
+        color: #fff;
+        font-weight: 600;
+        font-size: 0.9rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+        box-shadow: 0 4px 16px rgba(109, 40, 217, 0.4);
+        position: relative;
+        z-index: 1;
+    }
+
+    .greeting-cta:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 28px rgba(109, 40, 217, 0.5);
+        filter: brightness(1.08);
+    }
+
+    /* Action Cards */
+    .action-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.25rem;
+        margin-bottom: 2rem;
+    }
+
+    .action-card {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        border-radius: 16px;
+        padding: 1.75rem;
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .action-card::before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--card-accent, linear-gradient(90deg, #3b82f6, #6d28d9));
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+        transform-origin: left;
+    }
+
+    .action-card:hover {
+        transform: translateY(-5px);
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(139, 92, 246, 0.25);
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3);
+    }
+
+    .action-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .action-icon {
+        font-size: 2rem;
+        width: 54px;
+        height: 54px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .action-card h3 {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #f1f5f9;
+    }
+
+    .action-card p {
+        font-size: 0.85rem;
+        color: #64748b;
+        line-height: 1.5;
+    }
+
+    .action-arrow {
+        font-size: 1rem;
+        color: #475569;
+        align-self: flex-end;
+        transition: transform 0.2s, color 0.2s;
+    }
+
+    .action-card:hover .action-arrow {
+        transform: translateX(4px);
+        color: #8b5cf6;
+    }
+
+    /* Info strip */
+    .info-strip {
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 14px;
+        padding: 1.25rem 1.75rem;
+        display: flex;
+        gap: 2rem;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.02);
+        flex-wrap: wrap;
+    }
+
+    .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+    }
+
+    .info-item .info-label {
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        font-weight: 600;
+        color: #475569;
+    }
+
+    .info-item .info-value {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #cbd5e1;
+    }
+
+    .info-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #10b981;
+        align-self: center;
+        box-shadow: 0 0 6px #10b981;
+        flex-shrink: 0;
+    }
+
+    @media (max-width: 600px) {
+        .dashboard-greeting {
+            flex-direction: column;
+        }
+
+        .action-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .info-strip {
+            gap: 1rem;
+        }
+    }
+</style>
+
+<div class="dashboard-greeting">
+    <div class="greeting-left">
+        <div class="greeting-tag">● Active Session</div>
+        <h2>Hello, <span class="name">{{ request.session.loggeduser }}</span>!</h2>
+        <p>Your AI-powered recommendation workspace is ready. Generate insights, explore GenAI techniques, and enhance
+            your system.</p>
+    </div>
+    <a href="{% url 'genai_recommender' %}" class="greeting-cta">🔮 Generate Recommendation →</a>
+</div>
+
+<div class="action-grid">
+    <a href="{% url 'genai_recommender' %}" class="action-card"
+        style="--card-accent: linear-gradient(90deg, #3b82f6, #6d28d9);">
+        <div class="action-icon" style="background:rgba(59,130,246,0.15);">🔮</div>
+        <h3>Generate Recommendations</h3>
+        <p>Use GANs, VAEs, or Transformers to generate AI-powered recommendation insights.</p>
+        <span class="action-arrow">→</span>
+    </a>
+
+    <a href="{% url 'genai_recommender' %}?task=cold_start" class="action-card"
+        style="--card-accent: linear-gradient(90deg, #14b8a6, #0891b2);">
+        <div class="action-icon" style="background:rgba(20,184,166,0.15);">❄️</div>
+        <h3>Cold-Start Solver</h3>
+        <p>Address the cold-start challenge for new users and items with Generative AI techniques.</p>
+        <span class="action-arrow">→</span>
+    </a>
+
+    <a href="{% url 'genai_recommender' %}?task=diversity" class="action-card"
+        style="--card-accent: linear-gradient(90deg, #a855f7, #ec4899);">
+        <div class="action-icon" style="background:rgba(168,85,247,0.15);">🎯</div>
+        <h3>Enhance Diversity</h3>
+        <p>Prevent filter bubbles by injecting diversity into your recommendation pipeline.</p>
+        <span class="action-arrow">→</span>
+    </a>
+
+    <a href="{% url 'index' %}" class="action-card" style="--card-accent: linear-gradient(90deg, #ef4444, #dc2626);">
+        <div class="action-icon" style="background:rgba(239,68,68,0.12);">↩️</div>
+        <h3>Logout</h3>
+        <p>Securely sign out of your recommendation dashboard session.</p>
+        <span class="action-arrow">→</span>
+    </a>
+</div>
+
+<div class="info-strip">
+    <div class="info-dot"></div>
+    <div class="info-item">
+        <span class="info-label">Logged In As</span>
+        <span class="info-value">{{ request.session.loggeduser }}</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">AI Engine</span>
+        <span class="info-value">Google Gemini</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">Models Available</span>
+        <span class="info-value">GAN · VAE · Transformer</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">Status</span>
+        <span class="info-value" style="color:#6ee7b7;">● Online</span>
+    </div>
+</div>
+{% endblock %}

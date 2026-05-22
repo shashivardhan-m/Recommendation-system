@@ -1,0 +1,174 @@
+{% block content %}
+<style>
+    /* ─── USER BASE STYLES (shared across user pages) ─── */
+    :root {
+        --primary: #1e3a8a;
+        --primary-light: #3b82f6;
+        --accent: #6d28d9;
+        --accent-light: #8b5cf6;
+        --bg: #0a0f1e;
+        --surface: rgba(255, 255, 255, 0.04);
+        --surface-hover: rgba(255, 255, 255, 0.08);
+        --border: rgba(255, 255, 255, 0.1);
+        --text: #f1f5f9;
+        --text-muted: #94a3b8;
+    }
+
+    .user-topbar {
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        padding: 0.85rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        position: sticky;
+        top: 0;
+        z-index: 999;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .user-topbar-brand {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        color: #fff;
+        font-weight: 700;
+        font-size: 1rem;
+        text-decoration: none;
+    }
+
+    .user-topbar-brand .brand-icon {
+        width: 34px;
+        height: 34px;
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .user-topbar-nav {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        list-style: none;
+    }
+
+    .user-topbar-nav a {
+        color: rgba(255, 255, 255, 0.85);
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 500;
+        padding: 0.45rem 0.9rem;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        transition: all 0.25s ease;
+        white-space: nowrap;
+    }
+
+    .user-topbar-nav a:hover {
+        background: rgba(255, 255, 255, 0.2);
+        color: #fff;
+        transform: translateY(-1px);
+    }
+
+    .user-topbar-nav a.logout {
+        background: rgba(239, 68, 68, 0.15);
+        border-color: rgba(239, 68, 68, 0.3);
+        color: #fca5a5;
+    }
+
+    .user-topbar-nav a.logout:hover {
+        background: rgba(239, 68, 68, 0.25);
+        color: #fecaca;
+    }
+
+    .user-topbar-user {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.8rem;
+    }
+
+    .user-avatar {
+        width: 30px;
+        height: 30px;
+        background: linear-gradient(135deg, #3b82f6, #6d28d9);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #fff;
+    }
+
+    .user-page-wrapper {
+        padding: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        flex: 1;
+    }
+
+    /* Generic content styles */
+    .card-panel {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .card-panel:hover {
+        background: var(--surface-hover);
+        border-color: rgba(139, 92, 246, 0.2);
+    }
+
+    @media (max-width: 600px) {
+        .user-topbar {
+            padding: 0.75rem 1rem;
+        }
+
+        .user-topbar-brand span {
+            display: none;
+        }
+
+        .user-page-wrapper {
+            padding: 1rem;
+        }
+    }
+</style>
+
+<div class="user-topbar">
+    <a href="{% url 'UserHome' %}" class="user-topbar-brand">
+        <div class="brand-icon">🧠</div>
+        <span>AI Recommender</span>
+    </a>
+    <div class="user-topbar-user">
+        <div class="user-avatar">{{ request.session.loggeduser|first|upper }}</div>
+        <span>{{ request.session.loggeduser }}</span>
+    </div>
+    <ul class="user-topbar-nav">
+        <li><a href="{% url 'UserHome' %}">🏠 Home</a></li>
+        <li><a href="{% url 'genai_recommender' %}">🔮 Generate</a></li>
+        <li><a href="{% url 'index' %}" class="logout">↩ Logout</a></li>
+    </ul>
+</div>
+
+<div class="user-page-wrapper">
+    {% block user_content %}
+    {% endblock %}
+</div>
+
+<footer
+    style="text-align:center; padding:1.5rem; background:rgba(0,0,0,0.3); border-top:1px solid rgba(255,255,255,0.07); color:#64748b; font-size:0.82rem; margin-top:auto;">
+    © 2025 Generative AI Recommendation Systems. All rights reserved.
+</footer>
+{% endblock %}
