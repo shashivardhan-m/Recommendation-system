@@ -24,3 +24,5 @@ media/
 *.swo
 *~
 db.sqlite3
+.env
+.env
